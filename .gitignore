@@ -2,3 +2,4 @@
 /komga-ereader-page
 /app
 .DS_Store
+!.env.example
