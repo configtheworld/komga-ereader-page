@@ -1,0 +1,8 @@
+services:
+  komga-ereader-page:
+    build: .
+    # or: image: ghcr.io/<you>/komga-ereader-page:latest
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8094:8080"

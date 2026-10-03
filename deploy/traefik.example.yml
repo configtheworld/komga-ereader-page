@@ -1,0 +1,31 @@
+# Example Traefik dynamic configuration (file provider). Replace host, IP and middleware names.
+# Assumes: entrypoint "websecure", certResolver "letsencrypt",
+# and an Authelia forwardAuth middleware named "authelia" defined elsewhere
+# (e.g. in the file provider or as a Docker label -> use "authelia@docker").
+http:
+  routers:
+    books:
+      rule: "Host(`books.example.com`)"
+      entryPoints: [websecure]
+      service: books
+      middlewares:
+        - authelia            # default
+        # - books-basic       # alternative: swap with the line above
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    books:
+      loadBalancer:
+        servers:
+          - url: "http://<docker-host-ip>:8094"
+
+  # --- Alternative: basicAuth, if the e-reader can't handle Authelia's login page ---
+  # Generate the hash (paste as-is in file-provider YAML; only docker labels need $$):
+  #   htpasswd -nbB reader 'your-password'          # apache2-utils
+  #   docker run --rm httpd:alpine htpasswd -nbB reader 'your-password'
+  # middlewares:
+  #   books-basic:
+  #     basicAuth:
+  #       users:
+  #         - "reader:$2y$05$REPLACE_WITH_YOUR_HASH"
